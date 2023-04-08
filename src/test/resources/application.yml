@@ -1,0 +1,12 @@
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core: TRACE
+
+spring:
+  datasource:
+    username: root
+    url: jdbc:mysql://${url}?rewriteBatchedStatements=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    password: ${password}
