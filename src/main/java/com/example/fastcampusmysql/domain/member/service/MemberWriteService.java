@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberWriteService {
 	private final MemberRepository memberRepository;
 
-	public Member create(RegisterMemberCommand command) {
+	public Member register(RegisterMemberCommand command) {
 		/*
 			회원 정보 등록 (이메일, 닉네임, 생년월일)
 				- 닉네임은 10자를 넘길 수 없다.
@@ -23,7 +23,7 @@ public class MemberWriteService {
 			memberRepository.save()
 		 */
 
-		var member = Member.builder()
+		Member member = Member.builder()
 			.email(command.email())
 			.nickname(command.nickname())
 			.birthDay(command.birthDay())
