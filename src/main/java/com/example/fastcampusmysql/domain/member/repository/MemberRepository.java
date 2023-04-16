@@ -1,6 +1,13 @@
 package com.example.fastcampusmysql.domain.member.repository;
 
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -15,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 @Repository
 public class MemberRepository {
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	private final static String TABLE = "member";
 
 	public Member save(Member member) {
 		/*
@@ -33,7 +41,7 @@ public class MemberRepository {
 		SimpleJdbcInsertOperations simpleJdbcInsert =
 			new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
 				.withCatalogName("fast_sns")
-				.withTableName("Member")    					  // INSERT INTO 'TABLE'
+				.withTableName("Member")                          // INSERT INTO 'TABLE'
 				.usingGeneratedKeyColumns("id");    // AUTO_INCREMENT
 		SqlParameterSource params = new BeanPropertySqlParameterSource(member);
 
@@ -51,23 +59,25 @@ public class MemberRepository {
 			.build();
 	}
 
-/*
-	public Member insertWithBeanPropertySqlParameterSource(Member member) {
-		SqlParameterSource params = new BeanPropertySqlParameterSource(member);
-		long id = insertMember.executeAndReturnKey(params).longValue();
-		return Member
-			.builder()
-			.id(id)
-			.email(member.getEmail())
-			.nickname(member.getNickname())
-			.birthDay(member.getBirthDay())
-			.createdAt(member.getCreatedAt())
-			.build();
-	}
-*/
-
 	private Member update(Member member) {
 		// TODO : implemented
 		return member;
+	}
+
+	public Optional<Member> findById(Long id) {
+		String sql = String.format("SELECT * FROM %s WHERE id = :id", TABLE);
+		SqlParameterSource param = new MapSqlParameterSource()
+			.addValue("id", id);
+		RowMapper<Member> rowMapper = (ResultSet resultSet, int rowNum) -> Member
+			.builder()
+			.id(resultSet.getLong("id"))
+			.email(resultSet.getString("email"))
+			.nickname(resultSet.getString("nickname"))
+			.birthDay(resultSet.getObject("birthDay", LocalDate.class))
+			.createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
+			.build();
+
+		Member member = namedParameterJdbcTemplate.queryForObject(sql, param, rowMapper);
+		return Optional.ofNullable(member);
 	}
 }
