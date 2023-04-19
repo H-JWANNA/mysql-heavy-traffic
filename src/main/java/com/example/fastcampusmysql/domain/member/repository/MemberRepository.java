@@ -22,7 +22,15 @@ import lombok.RequiredArgsConstructor;
 @Repository
 public class MemberRepository {
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-	private final static String TABLE = "member";
+	final static String TABLE = "Member";
+	final static RowMapper<Member> rowMapper = (ResultSet resultSet, int rowNum) -> Member
+		.builder()
+		.id(resultSet.getLong("id"))
+		.email(resultSet.getString("email"))
+		.nickname(resultSet.getString("nickname"))
+		.birthDay(resultSet.getObject("birthDay", LocalDate.class))
+		.createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
+		.build();
 
 	public Member save(Member member) {
 		/*
@@ -41,7 +49,7 @@ public class MemberRepository {
 		SimpleJdbcInsertOperations simpleJdbcInsert =
 			new SimpleJdbcInsert(namedParameterJdbcTemplate.getJdbcTemplate())
 				.withCatalogName("fast_sns")
-				.withTableName("Member")                          // INSERT INTO 'TABLE'
+				.withTableName(TABLE)                          // INSERT INTO 'TABLE'
 				.usingGeneratedKeyColumns("id");    // AUTO_INCREMENT
 		SqlParameterSource params = new BeanPropertySqlParameterSource(member);
 
@@ -60,24 +68,19 @@ public class MemberRepository {
 	}
 
 	private Member update(Member member) {
-		// TODO : implemented
+		String sql = String.format("UPDATE %s SET email = :email, nickname = :nickname, birthDay = :birthDay WHERE id = :id", TABLE);
+		SqlParameterSource params = new BeanPropertySqlParameterSource(member);
+		namedParameterJdbcTemplate.update(sql, params);
+
 		return member;
 	}
 
 	public Optional<Member> findById(Long id) {
 		String sql = String.format("SELECT * FROM %s WHERE id = :id", TABLE);
-		SqlParameterSource param = new MapSqlParameterSource()
+		SqlParameterSource params = new MapSqlParameterSource()
 			.addValue("id", id);
-		RowMapper<Member> rowMapper = (ResultSet resultSet, int rowNum) -> Member
-			.builder()
-			.id(resultSet.getLong("id"))
-			.email(resultSet.getString("email"))
-			.nickname(resultSet.getString("nickname"))
-			.birthDay(resultSet.getObject("birthDay", LocalDate.class))
-			.createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
-			.build();
 
-		Member member = namedParameterJdbcTemplate.queryForObject(sql, param, rowMapper);
+		Member member = namedParameterJdbcTemplate.queryForObject(sql, params, rowMapper);
 		return Optional.ofNullable(member);
 	}
 }
