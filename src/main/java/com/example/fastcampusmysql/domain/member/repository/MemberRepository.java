@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberRepository {
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	final static String TABLE = "Member";
-	final static RowMapper<Member> rowMapper = (ResultSet resultSet, int rowNum) -> Member
+	final static RowMapper<Member> ROW_MAPPER = (ResultSet resultSet, int rowNum) -> Member
 		.builder()
 		.id(resultSet.getLong("id"))
 		.email(resultSet.getString("email"))
@@ -80,7 +80,7 @@ public class MemberRepository {
 		SqlParameterSource params = new MapSqlParameterSource()
 			.addValue("id", id);
 
-		Member member = namedParameterJdbcTemplate.queryForObject(sql, params, rowMapper);
+		Member member = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
 		return Optional.ofNullable(member);
 	}
 }
