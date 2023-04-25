@@ -2,6 +2,8 @@ package com.example.fastcampusmysql.application.controller;
 
 import java.util.List;
 
+import javax.validation.constraints.Positive;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,14 +37,14 @@ public class MemberController {
 	}
 
 	@PostMapping("/{id}/name")
-	public MemberDto changeNickname(@PathVariable Long id, @RequestBody String nickname) {
+	public MemberDto changeNickname(@PathVariable @Positive Long id, @RequestBody String nickname) {
 		memberWriteService.changeNickname(id, nickname);
 
 		return memberReadService.getMember(id);
 	}
 
 	@GetMapping("/{memberId}/nickname-histories")
-	public List<MemberNicknameHistoryDto> getNicknameHistories(@PathVariable Long memberId) {
+	public List<MemberNicknameHistoryDto> getNicknameHistories(@PathVariable @Positive Long memberId) {
 		return memberReadService.getNicknameHistories(memberId);
 	}
 }
