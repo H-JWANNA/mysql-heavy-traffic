@@ -3,6 +3,7 @@ package com.example.fastcampusmysql.domain.member.repository;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -68,7 +69,8 @@ public class MemberRepository {
 	}
 
 	private Member update(Member member) {
-		String sql = String.format("UPDATE %s SET email = :email, nickname = :nickname, birthDay = :birthDay WHERE id = :id", TABLE);
+		String sql = String.format(
+			"UPDATE %s SET email = :email, nickname = :nickname, birthDay = :birthDay WHERE id = :id", TABLE);
 		SqlParameterSource params = new BeanPropertySqlParameterSource(member);
 		namedParameterJdbcTemplate.update(sql, params);
 
@@ -82,5 +84,15 @@ public class MemberRepository {
 
 		Member member = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
 		return Optional.ofNullable(member);
+	}
+
+	public List<Member> findAllByIdIn(List<Long> ids) {
+		if (ids.isEmpty()) {
+			return List.of();
+		}
+
+		String sql = String.format("SELECT * FROM %s WHERE id in (:ids)", TABLE);
+		SqlParameterSource params = new MapSqlParameterSource().addValue("ids", ids);
+		return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
 	}
 }

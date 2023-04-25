@@ -2,9 +2,11 @@ package com.example.fastcampusmysql.domain.follow.repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -50,5 +52,19 @@ public class FollowRepository {
 			.toMemberId(follow.getToMemberId())
 			.createdAt(follow.getCreatedAt())
 			.build();
+	}
+
+	public List<Follow> findFollowingByMemberId(Long memberId) {
+		String sql = String.format("SELECT * FROM %s WHERE fromMemberId = :id", TABLE);
+		SqlParameterSource params = new MapSqlParameterSource().addValue("id", memberId);
+
+		return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+	}
+
+	public List<Follow> findFollowerByMemberId(Long memberId) {
+		String sql = String.format("SELECT * FROM %s WHERE toMemberId = :id", TABLE);
+		SqlParameterSource params = new MapSqlParameterSource().addValue("id", memberId);
+
+		return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
 	}
 }

@@ -33,4 +33,11 @@ public class MemberReadService {
 			.map(mapper::toDto)
 			.collect(Collectors.toList());
 	}
+
+	public List<MemberDto> getMembers(List<Long> ids) {
+		return memberRepository.findAllByIdIn(ids)
+			.stream()
+			.map(mapper::toDto)
+			.collect(Collectors.toList());
+	}
 }
