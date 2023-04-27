@@ -64,7 +64,7 @@ public class PostRepository {
 
 	public List<DailyPostCount> groupByCreatedDate(DailyPostCountRequest request) {
 		String sql = String.format("""
-				SELECT createdDate, memberId, count(id)
+				SELECT createdDate, memberId, count(id) as count
 				FROM %s
 				WHERE memberId = :memberId and createdDate BETWEEN :firstDate and :lastDate
 				GROUP BY memberId, createdDate
