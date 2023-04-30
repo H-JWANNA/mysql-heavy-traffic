@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -82,8 +83,13 @@ public class MemberRepository {
 		SqlParameterSource params = new MapSqlParameterSource()
 			.addValue("id", id);
 
-		Member member = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
-		return Optional.ofNullable(member);
+		try {
+			Member member = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+			return Optional.ofNullable(member);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
+		}
 	}
 
 	public List<Member> findAllByIdIn(List<Long> ids) {
