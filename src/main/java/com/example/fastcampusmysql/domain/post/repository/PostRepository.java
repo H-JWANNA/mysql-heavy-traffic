@@ -2,16 +2,22 @@ package com.example.fastcampusmysql.domain.post.repository;
 
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsertOperations;
 import org.springframework.stereotype.Repository;
 
+import com.example.fastcampusmysql.domain.common.helper.PageHelper;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCount;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCountRequest;
 import com.example.fastcampusmysql.domain.post.entity.Post;
@@ -30,6 +36,14 @@ public class PostRepository {
 		resultSet.getObject("createdDate", LocalDate.class),
 		resultSet.getLong("count")
 	);
+
+	private final static RowMapper<Post> ROW_MAPPER = (ResultSet resultSet, int rowNum) -> Post.builder()
+		.id(resultSet.getLong("id"))
+		.memberId(resultSet.getLong("memberId"))
+		.contents(resultSet.getString("contents"))
+		.createdDate(resultSet.getObject("createdDate", LocalDate.class))
+		.createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
+		.build();
 
 	public Post save(Post post) {
 		if (post.getId() == null) {
@@ -87,5 +101,38 @@ public class PostRepository {
 		SqlParameterSource params = new BeanPropertySqlParameterSource(request);
 
 		return namedParameterJdbcTemplate.query(sql, params, DAILY_POST_COUNT_MAPPER);
+	}
+
+	public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
+		String sql = String.format("""
+			SELECT *
+			FROM %s
+			WHERE memberId = :memberId
+			ORDER BY %s
+			LIMIT :size
+			OFFSET :offset
+			""", TABLE, PageHelper.orderBy(pageable.getSort()));
+
+		SqlParameterSource params = new MapSqlParameterSource()
+			.addValue("memberId", memberId)
+			.addValue("size", pageable.getPageSize())
+			.addValue("offset", pageable.getOffset());
+
+		List<Post> posts = namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+
+		return new PageImpl<>(posts, pageable, getCount(memberId));
+	}
+
+	private Long getCount(Long memberId) {
+		String sql = String.format("""
+			SELECT COUNT(id)
+			FROM %s
+			WHERE memberId = :memberId
+			""", TABLE);
+
+		SqlParameterSource params = new MapSqlParameterSource()
+			.addValue("memberId", memberId);
+
+		return namedParameterJdbcTemplate.queryForObject(sql, params, Long.class);
 	}
 }
