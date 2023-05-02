@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.fastcampusmysql.domain.common.util.CursorRequest;
+import com.example.fastcampusmysql.domain.common.util.PageCursor;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCount;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCountRequest;
 import com.example.fastcampusmysql.domain.post.dto.PostCommand;
@@ -46,5 +48,13 @@ public class PostController {
 		Pageable pageable
 	) {
 		return postReadService.getPosts(memberId, pageable);
+	}
+
+	@GetMapping("/members/{memberId}/by-cursor")
+	public PageCursor<Post> getPostsByCursor(
+		@PathVariable Long memberId,
+		CursorRequest cursorRequest
+	) {
+		return postReadService.getPosts(memberId, cursorRequest);
 	}
 }
