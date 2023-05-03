@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.fastcampusmysql.application.usecase.GetTimelinePostsUseCase;
 import com.example.fastcampusmysql.domain.common.util.CursorRequest;
 import com.example.fastcampusmysql.domain.common.util.PageCursor;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCount;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class PostController {
 	private final PostWriteService postWriteService;
 	private final PostReadService postReadService;
+	private final GetTimelinePostsUseCase getTimelinePostsUseCase;
 
 	@PostMapping
 	public PostDto create(PostCommand command) {
@@ -56,5 +58,13 @@ public class PostController {
 		CursorRequest cursorRequest
 	) {
 		return postReadService.getPosts(memberId, cursorRequest);
+	}
+
+	@GetMapping("/members/{memberId}/timeline")
+	public PageCursor<Post> getTimeline(
+		@PathVariable Long memberId,
+		CursorRequest cursorRequest
+	) {
+		return getTimelinePostsUseCase.execute(memberId, cursorRequest);
 	}
 }
