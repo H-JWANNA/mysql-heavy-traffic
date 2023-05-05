@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.fastcampusmysql.application.usecase.CreatePostUseCase;
 import com.example.fastcampusmysql.application.usecase.GetTimelinePostsUseCase;
 import com.example.fastcampusmysql.domain.common.util.CursorRequest;
 import com.example.fastcampusmysql.domain.common.util.PageCursor;
@@ -19,7 +20,6 @@ import com.example.fastcampusmysql.domain.post.dto.PostCommand;
 import com.example.fastcampusmysql.domain.post.dto.PostDto;
 import com.example.fastcampusmysql.domain.post.entity.Post;
 import com.example.fastcampusmysql.domain.post.service.PostReadService;
-import com.example.fastcampusmysql.domain.post.service.PostWriteService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,15 +27,15 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/posts")
 public class PostController {
-	private final PostWriteService postWriteService;
 	private final PostReadService postReadService;
 	private final GetTimelinePostsUseCase getTimelinePostsUseCase;
+	private final CreatePostUseCase createPostUseCase;
 
 	@PostMapping
 	public PostDto create(PostCommand command) {
 		// TODO: 회원 유효성 검증
 		// TODO: 이미지 업로드, 비디오 업로드, 게시물 수정, 댓글 등 부가 기능 추후에 추가
-		return postWriteService.create(command);
+		return createPostUseCase.execute(command);
 	}
 
 	@GetMapping("/daily-post-counts")
