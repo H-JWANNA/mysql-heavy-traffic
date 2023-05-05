@@ -103,6 +103,23 @@ public class PostRepository {
 		return namedParameterJdbcTemplate.query(sql, params, DAILY_POST_COUNT_MAPPER);
 	}
 
+	public List<Post> findAllByInId(List<Long> ids) {
+		if (ids.isEmpty()) {
+			return List.of();
+		}
+
+		String sql = String.format("""
+			SELECT *
+			FROM %s
+			WHERE id IN (:ids)
+			""", TABLE);
+
+		SqlParameterSource params = new MapSqlParameterSource()
+			.addValue("ids", ids);
+
+		return namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
+	}
+
 	public Page<Post> findAllByMemberId(Long memberId, Pageable pageable) {
 		String sql = String.format("""
 			SELECT *

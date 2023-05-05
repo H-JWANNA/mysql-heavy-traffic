@@ -45,6 +45,10 @@ public class PostReadService {
 		return new PageCursor<>(cursorRequest.next(nextKey), posts);
 	}
 
+	public List<Post> getPostsByIds(List<Long> ids) {
+		return postRepository.findAllByInId(ids);
+	}
+
 	private List<Post> findAllBy(Long memberId, CursorRequest cursorRequest) {
 		// 클라이언트가 처음 데이터를 요청할 때는 Key 가 없으므로 Default Key 설정
 		if (cursorRequest.hasKey()) {

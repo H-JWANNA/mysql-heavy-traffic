@@ -65,6 +65,6 @@ public class PostController {
 		@PathVariable Long memberId,
 		CursorRequest cursorRequest
 	) {
-		return getTimelinePostsUseCase.execute(memberId, cursorRequest);
+		return getTimelinePostsUseCase.executeByTimeline(memberId, cursorRequest);
 	}
 }
