@@ -1,6 +1,7 @@
 package com.example.fastcampusmysql.domain.member.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fastcampusmysql.domain.member.dto.MemberDto;
 import com.example.fastcampusmysql.domain.member.dto.RegisterMemberCommand;
@@ -19,6 +20,7 @@ public class MemberWriteService {
 	private final MemberRepository memberRepository;
 	private final MemberNIcknameHistoryRepository historyRepository;
 
+	@Transactional
 	public MemberDto register(RegisterMemberCommand command) {
 		Member member = Member.builder()
 			.email(command.email())
@@ -32,6 +34,7 @@ public class MemberWriteService {
 		return mapper.toDto(savedMember);
 	}
 
+	@Transactional
 	public void changeNickname(Long id, String nickname) {
 		/*
 			1. 회원 이름 변경
