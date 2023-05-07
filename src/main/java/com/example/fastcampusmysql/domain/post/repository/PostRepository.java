@@ -111,7 +111,7 @@ public class PostRepository {
 			memberId = :memberId,
 			contents = :contents,
 			createdDate = :createdDate,
-			likeCount = :likeCount
+			likeCount = :likeCount,
 			createdAt = :createdAt
 			WHERE id = :id
 			""", TABLE);
@@ -121,12 +121,16 @@ public class PostRepository {
 		return post;
 	}
 
-	public Optional<Post> findById(Long postId) {
+	public Optional<Post> findById(Long postId, Boolean requiredLock) {
 		String sql = String.format("""
 			SELECT *
 			FROM %s
 			WHERE id = :id
 			""", TABLE);
+
+		if (requiredLock) {
+			sql += " FOR UPDATE";
+		}
 
 		SqlParameterSource params = new MapSqlParameterSource()
 			.addValue("id", postId);

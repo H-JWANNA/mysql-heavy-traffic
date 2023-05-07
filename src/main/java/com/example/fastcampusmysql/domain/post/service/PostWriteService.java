@@ -30,7 +30,7 @@ public class PostWriteService {
 
 	@Transactional
 	public void likePost(Long postId) {
-		var post = postRepository.findById(postId).orElseThrow();
+		var post = postRepository.findById(postId, true).orElseThrow();
 		post.incrementLikeCount();
 		postRepository.save(post);
 	}
