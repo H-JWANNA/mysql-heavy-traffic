@@ -1,6 +1,7 @@
 package com.example.fastcampusmysql.domain.post.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.fastcampusmysql.domain.post.dto.PostCommand;
 import com.example.fastcampusmysql.domain.post.dto.PostDto;
@@ -25,5 +26,12 @@ public class PostWriteService {
 		Post savedPost = postRepository.save(post);
 
 		return mapper.toDto(savedPost);
+	}
+
+	@Transactional
+	public void likePost(Long postId) {
+		var post = postRepository.findById(postId).orElseThrow();
+		post.incrementLikeCount();
+		postRepository.save(post);
 	}
 }

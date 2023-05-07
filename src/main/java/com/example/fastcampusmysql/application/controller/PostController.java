@@ -20,6 +20,7 @@ import com.example.fastcampusmysql.domain.post.dto.PostCommand;
 import com.example.fastcampusmysql.domain.post.dto.PostDto;
 import com.example.fastcampusmysql.domain.post.entity.Post;
 import com.example.fastcampusmysql.domain.post.service.PostReadService;
+import com.example.fastcampusmysql.domain.post.service.PostWriteService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/posts")
 public class PostController {
+	private final PostWriteService postWriteService;
 	private final PostReadService postReadService;
 	private final GetTimelinePostsUseCase getTimelinePostsUseCase;
 	private final CreatePostUseCase createPostUseCase;
@@ -66,5 +68,11 @@ public class PostController {
 		CursorRequest cursorRequest
 	) {
 		return getTimelinePostsUseCase.executeByTimeline(memberId, cursorRequest);
+	}
+
+	@PostMapping("/{postId}/like")
+	public void likePost(@PathVariable Long postId) {
+		postWriteService.likePost(postId);
+
 	}
 }

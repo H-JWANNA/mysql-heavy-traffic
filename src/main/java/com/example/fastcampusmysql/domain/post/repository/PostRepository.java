@@ -4,7 +4,9 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -51,8 +53,7 @@ public class PostRepository {
 			return insert(post);
 		}
 
-		// 현재는 수정 기능 X
-		throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다.");
+		return update(post);
 	}
 
 	private Post insert(Post post) {
@@ -102,6 +103,42 @@ public class PostRepository {
 		SqlParameterSource params = new BeanPropertySqlParameterSource(request);
 
 		return namedParameterJdbcTemplate.query(sql, params, DAILY_POST_COUNT_MAPPER);
+	}
+
+	private Post update(Post post) {
+		String sql = String.format("""
+			UPDATE %s SET
+			memberId = :memberId,
+			contents = :contents,
+			createdDate = :createdDate,
+			likeCount = :likeCount
+			createdAt = :createdAt
+			WHERE id = :id
+			""", TABLE);
+		SqlParameterSource params = new BeanPropertySqlParameterSource(post);
+		namedParameterJdbcTemplate.update(sql, params);
+
+		return post;
+	}
+
+	public Optional<Post> findById(Long postId) {
+		String sql = String.format("""
+			SELECT *
+			FROM %s
+			WHERE id = :id
+			""", TABLE);
+
+		SqlParameterSource params = new MapSqlParameterSource()
+			.addValue("id", postId);
+
+		try {
+			Post post = namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+			return Optional.ofNullable(post);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return Optional.empty();
+		}
+
 	}
 
 	public List<Post> findAllByInId(List<Long> ids) {

@@ -17,7 +17,7 @@ public class Post {
 
 	private final LocalDate createdDate;
 
-	private final Long likeCount;
+	private Long likeCount;
 
 	private final LocalDateTime createdAt;
 
@@ -29,5 +29,9 @@ public class Post {
 		this.createdDate = createdDate == null ? LocalDate.now() : createdDate;
 		this.likeCount = likeCount == null ? 0 : likeCount;
 		this.createdAt = createdAt == null ? LocalDateTime.now() : createdAt;
+	}
+
+	public void incrementLikeCount() {
+		likeCount += 1;
 	}
 }
