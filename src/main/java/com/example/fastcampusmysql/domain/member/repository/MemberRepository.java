@@ -70,8 +70,13 @@ public class MemberRepository {
 	}
 
 	private Member update(Member member) {
-		String sql = String.format(
-			"UPDATE %s SET email = :email, nickname = :nickname, birthDay = :birthDay WHERE id = :id", TABLE);
+		String sql = String.format("""
+			UPDATE %s SET
+			email = :email,
+			nickname = :nickname,
+			birthDay = :birthDay
+			WHERE id = :id
+			""", TABLE);
 		SqlParameterSource params = new BeanPropertySqlParameterSource(member);
 		namedParameterJdbcTemplate.update(sql, params);
 
