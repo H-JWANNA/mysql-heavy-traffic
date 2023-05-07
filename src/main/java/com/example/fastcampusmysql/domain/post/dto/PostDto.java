@@ -8,6 +8,7 @@ public record PostDto(
 	Long memberId,
 	String contents,
 	LocalDate createdDate,
+	Long likeCount,
 	LocalDateTime createdAt
 ) {
 }

@@ -13,6 +13,7 @@ public class PostMapper {
 			post.getMemberId(),
 			post.getContents(),
 			post.getCreatedDate(),
+			post.getLikeCount(),
 			post.getCreatedAt());
 	}
 }
