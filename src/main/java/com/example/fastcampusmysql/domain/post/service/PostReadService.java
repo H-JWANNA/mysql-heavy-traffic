@@ -10,7 +10,9 @@ import com.example.fastcampusmysql.domain.common.util.CursorRequest;
 import com.example.fastcampusmysql.domain.common.util.PageCursor;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCount;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCountRequest;
+import com.example.fastcampusmysql.domain.post.dto.PostDto;
 import com.example.fastcampusmysql.domain.post.entity.Post;
+import com.example.fastcampusmysql.domain.post.mapper.PostMapper;
 import com.example.fastcampusmysql.domain.post.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class PostReadService {
+	private final PostMapper mapper;
 	private final PostRepository postRepository;
 
 	public List<DailyPostCount> getDailyPostCount(DailyPostCountRequest request) {
@@ -25,8 +28,13 @@ public class PostReadService {
 		return postRepository.groupByCreatedDate(request);
 	}
 
-	public Page<Post> getPosts(Long memberId, Pageable pageable) {
-		return postRepository.findAllByMemberId(memberId, pageable);
+	public Post getPost(Long postId) {
+		return postRepository.findById(postId, false).orElseThrow();
+	}
+
+	public Page<PostDto> getPosts(Long memberId, Pageable pageable) {
+		return postRepository.findAllByMemberId(memberId, pageable)
+			.map(mapper::toDto);
 	}
 
 	public PageCursor<Post> getPosts(Long memberId, CursorRequest cursorRequest) {

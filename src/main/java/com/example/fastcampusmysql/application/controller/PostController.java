@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.fastcampusmysql.application.usecase.CreatePostLikeUseCase;
 import com.example.fastcampusmysql.application.usecase.CreatePostUseCase;
 import com.example.fastcampusmysql.application.usecase.GetTimelinePostsUseCase;
 import com.example.fastcampusmysql.domain.common.util.CursorRequest;
@@ -32,6 +34,7 @@ public class PostController {
 	private final PostReadService postReadService;
 	private final GetTimelinePostsUseCase getTimelinePostsUseCase;
 	private final CreatePostUseCase createPostUseCase;
+	private final CreatePostLikeUseCase createPostLikeUseCase;
 
 	@PostMapping
 	public PostDto create(PostCommand command) {
@@ -47,7 +50,7 @@ public class PostController {
 	}
 
 	@GetMapping("/members/{memberId}")
-	public Page<Post> getPosts(
+	public Page<PostDto> getPosts(
 		@PathVariable Long memberId,
 		Pageable pageable
 	) {
@@ -70,9 +73,14 @@ public class PostController {
 		return getTimelinePostsUseCase.executeByTimeline(memberId, cursorRequest);
 	}
 
-	@PostMapping("/{postId}/like")
+	@PostMapping("/{postId}/like/v1")
 	public void likePost(@PathVariable Long postId) {
 		// postWriteService.likePost(postId);
 		postWriteService.likePostByOptimisticLock(postId);
+	}
+
+	@PostMapping("/{postId}/like/v2")
+	public void likePostV2(@PathVariable Long postId, @RequestParam Long memberId) {
+		createPostLikeUseCase.execute(memberId, postId);
 	}
 }
